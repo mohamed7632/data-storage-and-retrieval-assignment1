@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -64,8 +65,8 @@ public class K_Way_Merge_Sort {
 	}
 	
 	public static void DoKWayMergeAndWriteASortedFile(String[] SortedRunsNames,int K, String Sortedfilename) throws IOException {
-		
-		// base case (3amalna merge le kol el files khalas w etba2a file wa7d bs w feh kol el records sorted)
+		// base case (3amalna merge le kol el files
+		// khalas w etba2a file wa7d bs w feh kol el records sorted)
 		if(SortedRunsNames.length == 1) {
 			File file = new File(SortedRunsNames[0]);
 			file.renameTo(new File(Sortedfilename));
@@ -84,11 +85,11 @@ public class K_Way_Merge_Sort {
 			long size = 0l; //  el variable da beygama3 el sizes bta3t el files eli hayet3mlha merge
 			
 			String file_name = "merged"; // esm el file eli haykon megam3 el files eli et3amlha merge
-			
+			//size -> k
 			for(int j = 0; j < files_to_be_merged.size(); j++) {
 				file_name += "(" + files_to_be_merged.get(j).Get_T1() + ")";
 				size += new RandomAccessFile(files_to_be_merged.get(j).Get_T1(), "r").length();
-			}
+		}
 			file_name += ".bin";
 			new_run_files.add(file_name); /* el file_name da ben7oto fl ArrayList de 3ashan agam3 el run files el gdeeda 
 			w a7otohom fel String[] SortedRunsNames wana ba call el function mn gdeed 3ashan ye3ml nafs el kalam le7ad mawsal lel base case */
@@ -140,6 +141,35 @@ public class K_Way_Merge_Sort {
 		}
 		DoKWayMergeAndWriteASortedFile(SortedRunsNames, K, Sortedfilename);
 	}
+        public  static int binarSearch(String sortedFileName,long l,long h,int RecordKey) throws FileNotFoundException, IOException{
+           RandomAccessFile run_file = new RandomAccessFile(sortedFileName, "rws");
+             if (h>= l) { 
+            long mid = l + (h - l) / 2;
+            run_file.seek(mid);
+            Record record = read_record(run_file);
+            if(record.getKey()==RecordKey){
+                run_file.close();
+                return ((int)mid)/8;//record.getOffset();
+            }
+            if(record.getKey()>RecordKey)
+                 return binarSearch(sortedFileName,l,mid-1,RecordKey);
+                    
+                   
+               if(record.getKey()<RecordKey)
+                    return binarSearch(sortedFileName,mid+1,h,RecordKey);
+                   
+               
+          }
+             //run_file.close();
+             return -1;
+        }
+       public static int BinarySearchOnSortedFile(String sortedFileName,int RecordKey) throws FileNotFoundException, IOException{
+             RandomAccessFile run_file = new RandomAccessFile(sortedFileName, "rws");
+             long len=run_file.length();
+             run_file.close();
+             int found=binarSearch(sortedFileName,0,len, RecordKey);
+             return found;
+        }
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -170,6 +200,15 @@ public class K_Way_Merge_Sort {
 			read_record(file).print();
 		}
 		file.close();
+                //RandomAccessFile newfile = new RandomAccessFile("test.bin", "r");  
+                int x=BinarySearchOnSortedFile("test.bin",443);
+              if(x==-1)
+              System.out.println("not found");
+              else
+              {
+                  System.out.println("the offset is  "+ x);
+              }
+              
 		
 	}
 }
