@@ -1,5 +1,4 @@
 import java.util.Comparator;
-
 public class Comparator_1 implements Comparator<Pair<Record,Integer>> {
 
 	@Override
